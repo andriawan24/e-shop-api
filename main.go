@@ -11,6 +11,11 @@ import (
 	"os"
 	"strings"
 
+	_ "e-shop/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -20,6 +25,21 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+// @title E-Shop API
+// @version 1.0
+// @description This is a sample server todo server. You can visit the GitHub repository at https://github.com/LordGhostX/swag-gin-demo
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /api/v1
+// @query.collection.format multi
 
 func main() {
 	err := godotenv.Load()
@@ -67,6 +87,9 @@ func main() {
 
 	// Products
 	api.GET("/products", productHandler.GetProducts)
+
+	// Documentation URL
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run()
 }

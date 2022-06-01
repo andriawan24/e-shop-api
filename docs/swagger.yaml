@@ -1,0 +1,109 @@
+basePath: /api/v1
+definitions:
+  merchants.Merchant:
+    properties:
+      address:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phoneNumber:
+        type: string
+      tagline:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  products.Category:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  products.Product:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      discountedPrice:
+        type: integer
+      id:
+        type: integer
+      merchants:
+        $ref: '#/definitions/merchants.Merchant'
+      merchantsID:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      productCategories:
+        items:
+          $ref: '#/definitions/products.ProductCategory'
+        type: array
+      productImages:
+        items:
+          $ref: '#/definitions/products.ProductImage'
+        type: array
+      stocks:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  products.ProductCategory:
+    properties:
+      category:
+        $ref: '#/definitions/products.Category'
+      categoryID:
+        type: integer
+      id:
+        type: integer
+      productID:
+        type: integer
+    type: object
+  products.ProductImage:
+    properties:
+      id:
+        type: integer
+      imageURL:
+        type: string
+      productID:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server todo server. You can visit the GitHub repository
+    at https://github.com/LordGhostX/swag-gin-demo
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: E-Shop API
+  version: "1.0"
+paths:
+  /products:
+    get:
+      operationId: get-all-products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/products.Product'
+      summary: get all products
+      tags:
+      - Products
+swagger: "2.0"

@@ -17,6 +17,13 @@ func NewProductHandler(productService products.Service) *productHandler {
 	return &productHandler{productService}
 }
 
+// GetProducts godoc
+// @Summary get all products
+// @ID get-all-products
+// @Tags Products
+// @Produce json
+// @Success 200 {object} products.Product
+// @Router /products [get]
 func (h *productHandler) GetProducts(c *gin.Context) {
 	productList, err := h.productService.GetAllProducts()
 	if err != nil {
