@@ -5,10 +5,16 @@ import (
 	"e-shop/src/handler"
 	"e-shop/src/products"
 	"e-shop/src/users"
+	"e-shop/src/utils"
 	"log"
+	"net/http"
 	"os"
+	"strings"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -40,6 +46,10 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 
+	secretKey, _ := utils.GetSecretKey()
+	cookieStore := cookie.NewStore([]byte(secretKey))
+	router.Use(sessions.Sessions("e-shop", cookieStore))
+
 	api := router.Group("/api/v1")
 
 	api.GET("/", func(c *gin.Context) {
@@ -50,6 +60,10 @@ func main() {
 
 	// Auth
 	api.POST("sign-up", userHandler.RegisterUser)
+	api.POST("sign-in", userHandler.Login)
+	api.POST("me", userHandler.FetchUser)
+	api.PUT("update-profile", authMiddleware(authService, userService), userHandler.UpdateUser)
+	api.GET("me", authMiddleware(authService, userService), userHandler.FetchUser)
 
 	// Products
 	api.GET("/products", productHandler.GetProducts)
@@ -57,19 +71,73 @@ func main() {
 	router.Run()
 }
 
-func corsMiddleware() gin.HandlerFunc {
+func authMiddleware(authService auth.Service, userService users.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "IP_HERE")
-		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		authHeader := c.GetHeader("Authorization")
 
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(200)
-		} else {
-			c.Next()
+		if !strings.Contains(authHeader, "Bearer") {
+			response := utils.APIResponse(
+				"Unauthorized",
+				http.StatusUnauthorized,
+				"error",
+				nil,
+			)
+
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
 		}
+
+		// Split between Bearer and token
+		tokenString := ""
+		arrayToken := strings.Split(authHeader, " ")
+
+		if len(arrayToken) == 2 {
+			tokenString = arrayToken[1]
+		}
+
+		token, err := authService.ValidateToken(tokenString)
+		if err != nil {
+			response := utils.APIResponse(
+				"Unauthorized",
+				http.StatusUnauthorized,
+				"error",
+				nil,
+			)
+
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		claim, ok := token.Claims.(jwt.MapClaims)
+
+		if !ok || !token.Valid {
+			response := utils.APIResponse(
+				"Unauthorized",
+				http.StatusUnauthorized,
+				"error",
+				nil,
+			)
+
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		userId := int(claim["users_id"].(float64))
+
+		user, err := userService.GetUserByID(userId)
+
+		if err != nil {
+			response := utils.APIResponse(
+				"Unauthorized",
+				http.StatusUnauthorized,
+				"error",
+				nil,
+			)
+
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		c.Set("currentUser", user)
 	}
 }
