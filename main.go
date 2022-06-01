@@ -3,6 +3,7 @@ package main
 import (
 	"e-shop/src/auth"
 	"e-shop/src/handler"
+	"e-shop/src/products"
 	"e-shop/src/users"
 	"log"
 	"os"
@@ -28,6 +29,10 @@ func main() {
 	authService := auth.NewService()
 	userHandler := handler.NewUserHandler(userService, authService)
 
+	productRepository := products.NewRepository(db)
+	prductService := products.NewService(productRepository)
+	productHandler := handler.NewProductHandler(prductService)
+
 	if err != nil {
 		log.Fatal("Error while connecting to SQL " + err.Error())
 	}
@@ -43,7 +48,11 @@ func main() {
 		})
 	})
 
+	// Auth
 	api.POST("sign-up", userHandler.RegisterUser)
+
+	// Products
+	api.GET("/products", productHandler.GetProducts)
 
 	router.Run()
 }
