@@ -23,7 +23,8 @@ func NewProductHandler(productService products.Service) *productHandler {
 // @ID get-all-products
 // @Tags Products
 // @Produce json
-// @Success 200 {object} products.Product
+// @Param category_id query int false "Category ID"
+// @Success 200 {array} products.Product
 // @Router /products [get]
 func (h *productHandler) GetProducts(c *gin.Context) {
 	categoryId, _ := strconv.Atoi(c.Query("category_id"))
@@ -57,6 +58,13 @@ func (h *productHandler) GetProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Getcategories godoc
+// @Summary get all categories
+// @ID get-all-categories
+// @Tags Products
+// @Produce json
+// @Success 200 {array} products.Category
+// @Router /categories [get]
 func (h *productHandler) GetCategories(c *gin.Context) {
 	categoryList, err := h.productService.GetCategories()
 	if err != nil {

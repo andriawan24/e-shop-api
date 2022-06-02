@@ -23,6 +23,29 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/categories": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "get all categories",
+                "operationId": "get-all-categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/products.Category"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/me": {
             "get": {
                 "consumes": [
@@ -65,11 +88,22 @@ const docTemplate = `{
                 ],
                 "summary": "get all products",
                 "operationId": "get-all-products",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "category_id",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/products.Product"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/products.Product"
+                            }
                         }
                     }
                 }
@@ -191,6 +225,12 @@ const docTemplate = `{
         "products.Product": {
             "type": "object",
             "properties": {
+                "category": {
+                    "$ref": "#/definitions/products.Category"
+                },
+                "categoryID": {
+                    "type": "integer"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -215,12 +255,6 @@ const docTemplate = `{
                 "price": {
                     "type": "integer"
                 },
-                "productCategories": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/products.ProductCategory"
-                    }
-                },
                 "productImages": {
                     "type": "array",
                     "items": {
@@ -232,23 +266,6 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
-                }
-            }
-        },
-        "products.ProductCategory": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "$ref": "#/definitions/products.Category"
-                },
-                "categoryID": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "productID": {
-                    "type": "integer"
                 }
             }
         },
