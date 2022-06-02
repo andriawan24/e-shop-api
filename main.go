@@ -4,6 +4,7 @@ import (
 	"e-shop/src/auth"
 	"e-shop/src/carts"
 	"e-shop/src/handler"
+	"e-shop/src/payment"
 	"e-shop/src/products"
 	"e-shop/src/transactions"
 	"e-shop/src/users"
@@ -64,7 +65,8 @@ func main() {
 	cartHandler := handler.NewCartsHandler(cartService)
 
 	transactionRepository := transactions.NewRepository(db)
-	transactionService := transactions.NewService(transactionRepository)
+	paymentService := payment.NewService()
+	transactionService := transactions.NewService(transactionRepository, paymentService)
 	transactionHandler := handler.NewTransactionHandler(transactionService, cartService)
 
 	router := gin.Default()
@@ -102,6 +104,7 @@ func main() {
 	// Transactions
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransaction)
 	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CheckoutTransaction)
+	api.POST("/finish_payment", transactionHandler.GetNotification)
 
 	// Documentation URL
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

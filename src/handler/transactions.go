@@ -87,19 +87,15 @@ func (h *transactionHandler) CheckoutTransaction(c *gin.Context) {
 		})
 	}
 
-	// TODO: Membuat URL Payment
-	paymentURL := "https://hello.world"
-
 	// Set deadline to one day
-	deadline := transaction.Deadline.Add(time.Hour * 24)
+	deadline := time.Now().Add(time.Hour * 24)
 
 	transaction.UserID = userId
 	transaction.TotalPrice = totalPrice
-	transaction.PaymentURL = paymentURL
 	transaction.Deadline = deadline
 	transaction.Status = "pending"
 
-	newTransaction, err := h.transactionService.CheckoutCart(transaction, transactionDetail)
+	newTransaction, err := h.transactionService.CheckoutCart(transaction, transactionDetail, currentUser)
 	if err != nil {
 		response := utils.APIResponse(
 			"Failed to create transactions",
@@ -136,4 +132,26 @@ func (h *transactionHandler) CheckoutTransaction(c *gin.Context) {
 	)
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *transactionHandler) GetNotification(c *gin.Context) {
+	var input transactions.TransactionNotificationInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := utils.APIResponse("Failed to process notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	err = h.transactionService.ProccessPayment(input)
+	if err != nil {
+		response := utils.APIResponse("Failed to process notification", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, input)
 }

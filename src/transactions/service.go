@@ -1,18 +1,25 @@
 package transactions
 
-import "errors"
+import (
+	"e-shop/src/payment"
+	"e-shop/src/users"
+	"errors"
+	"strconv"
+)
 
 type Service interface {
 	GetTransactions(userID int) ([]Transaction, error)
-	CheckoutCart(transaction Transaction, transactionDetail []TransactionDetail) (Transaction, error)
+	CheckoutCart(transaction Transaction, transactionDetail []TransactionDetail, user users.User) (Transaction, error)
+	ProccessPayment(input TransactionNotificationInput) error
 }
 
 type service struct {
-	repository Repository
+	repository     Repository
+	paymentService payment.Service
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository}
+func NewService(repository Repository, paymentService payment.Service) *service {
+	return &service{repository, paymentService}
 }
 
 func (s *service) GetTransactions(userID int) ([]Transaction, error) {
@@ -24,9 +31,26 @@ func (s *service) GetTransactions(userID int) ([]Transaction, error) {
 	return transactions, nil
 }
 
-func (s *service) CheckoutCart(transaction Transaction, transactionDetail []TransactionDetail) (Transaction, error) {
+func (s *service) CheckoutCart(transaction Transaction, transactionDetail []TransactionDetail, user users.User) (Transaction, error) {
 
 	newTransaction, err := s.repository.InsertTransaction(transaction)
+	if err != nil {
+		return newTransaction, err
+	}
+
+	inputTransaction := payment.Transaction{
+		Amount: newTransaction.TotalPrice,
+		ID:     newTransaction.ID,
+	}
+
+	paymentURL, err := s.paymentService.GetPaymentURL(inputTransaction, user)
+	if err != nil {
+		return newTransaction, err
+	}
+
+	newTransaction.PaymentURL = paymentURL
+
+	newTransaction, err = s.repository.Update(newTransaction)
 	if err != nil {
 		return newTransaction, err
 	}
@@ -50,4 +74,28 @@ func (s *service) CheckoutCart(transaction Transaction, transactionDetail []Tran
 	updateTransaction := newTransaction
 
 	return updateTransaction, nil
+}
+
+func (s *service) ProccessPayment(input TransactionNotificationInput) error {
+	transaction_id, _ := strconv.Atoi(input.OrderID)
+
+	transaction, err := s.repository.GetByID(transaction_id)
+	if err != nil {
+		return err
+	}
+
+	if input.PaymentType == "credit_card" && input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
+		transaction.Status = "paid"
+	} else if input.TransactionStatus == "settlement" {
+		transaction.Status = "paid"
+	} else if input.TransactionStatus == "deny" || input.TransactionStatus == "expire" || input.TransactionStatus == "cancel" {
+		transaction.Status = "CANCELLED"
+	}
+
+	_, err = s.repository.Update(transaction)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
