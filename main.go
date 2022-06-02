@@ -5,6 +5,7 @@ import (
 	"e-shop/src/carts"
 	"e-shop/src/handler"
 	"e-shop/src/products"
+	"e-shop/src/transactions"
 	"e-shop/src/users"
 	"e-shop/src/utils"
 	"log"
@@ -62,9 +63,9 @@ func main() {
 	cartService := carts.NewService(cartRepository)
 	cartHandler := handler.NewCartsHandler(cartService)
 
-	if err != nil {
-		log.Fatal("Error while connecting to SQL " + err.Error())
-	}
+	transactionRepository := transactions.NewRepository(db)
+	transactionService := transactions.NewService(transactionRepository)
+	transactionHandler := handler.NewTransactionHandler(transactionService, cartService)
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -97,6 +98,10 @@ func main() {
 	api.POST("/carts", authMiddleware(authService, userService), cartHandler.SaveOrUpdateCart)
 	api.DELETE("/carts", authMiddleware(authService, userService), cartHandler.RemoveCart)
 	api.DELETE("/carts/product", authMiddleware(authService, userService), cartHandler.RemoveProduct)
+
+	// Transactions
+	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransaction)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CheckoutTransaction)
 
 	// Documentation URL
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
