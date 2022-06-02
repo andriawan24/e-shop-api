@@ -173,6 +173,15 @@ func (h *userHandler) FetchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// UpdateUser godoc
+// @Summary Updating user data
+// @ID update-user
+// @Tags Account
+// @Produce json
+// @Param Authorization header string true "Access Token"
+// @Param request_body body users.UpdateUserInput true "Update User input"
+// @Success 200 {object} users.User
+// @Router /update-profile [put]
 func (h *userHandler) UpdateUser(c *gin.Context) {
 	var input users.UpdateUserInput
 

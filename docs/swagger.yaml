@@ -1,5 +1,72 @@
 basePath: /api/v1
 definitions:
+  carts.Cart:
+    properties:
+      cartDetail:
+        items:
+          $ref: '#/definitions/carts.CartDetail'
+        type: array
+      id:
+        type: integer
+      user:
+        $ref: '#/definitions/users.User'
+      userID:
+        type: integer
+    type: object
+  carts.CartDetail:
+    properties:
+      cartID:
+        type: integer
+      id:
+        type: integer
+      product:
+        $ref: '#/definitions/products.Product'
+      productID:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  carts.CartDetailFormatter:
+    properties:
+      cart_id:
+        type: integer
+      id:
+        type: integer
+      product:
+        $ref: '#/definitions/products.ProductFormatter'
+      quantity:
+        type: integer
+    type: object
+  carts.CartFormatter:
+    properties:
+      cart_details:
+        items:
+          $ref: '#/definitions/carts.CartDetailFormatter'
+        type: array
+      id:
+        type: integer
+      user:
+        $ref: '#/definitions/users.UserFormatter'
+      user_id:
+        type: integer
+    type: object
+  carts.RemoveProductInput:
+    properties:
+      product_id:
+        type: integer
+    required:
+    - product_id
+    type: object
+  carts.SaveCartInput:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
   merchants.Merchant:
     properties:
       address:
@@ -19,7 +86,35 @@ definitions:
       updatedAt:
         type: string
     type: object
+  merchants.MerchantFormatter:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone_number:
+        type: string
+      tagline:
+        type: string
+      updated_at:
+        type: string
+    type: object
   products.Category:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  products.CategoryFormatter:
     properties:
       description:
         type: string
@@ -59,6 +154,29 @@ definitions:
       updatedAt:
         type: string
     type: object
+  products.ProductFormatter:
+    properties:
+      category:
+        $ref: '#/definitions/products.CategoryFormatter'
+      description:
+        type: string
+      discounted_price:
+        type: integer
+      id:
+        type: integer
+      images:
+        items:
+          $ref: '#/definitions/products.ProductImageFormatter'
+        type: array
+      merchant:
+        $ref: '#/definitions/merchants.MerchantFormatter'
+      name:
+        type: string
+      price:
+        type: integer
+      stocks:
+        type: integer
+    type: object
   products.ProductImage:
     properties:
       id:
@@ -66,6 +184,15 @@ definitions:
       imageURL:
         type: string
       productID:
+        type: integer
+    type: object
+  products.ProductImageFormatter:
+    properties:
+      id:
+        type: integer
+      image_url:
+        type: string
+      products_id:
         type: integer
     type: object
   users.LoginInput:
@@ -97,6 +224,21 @@ definitions:
     - password
     - phone_number
     type: object
+  users.UpdateUserInput:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
   users.User:
     properties:
       address:
@@ -116,6 +258,21 @@ definitions:
       updatedAt:
         type: string
     type: object
+  users.UserFormatter:
+    properties:
+      access_token:
+        type: string
+      address:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -129,6 +286,98 @@ info:
   title: E-Shop API
   version: "1.0"
 paths:
+  /carts:
+    delete:
+      consumes:
+      - application/json
+      operationId: remove-cart
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Remove the whole cart
+      tags:
+      - Cart
+    get:
+      operationId: get-user-cart
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/carts.CartFormatter'
+      summary: Get User Cart
+      tags:
+      - Cart
+    post:
+      consumes:
+      - application/json
+      operationId: save-or-update-cart
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Save Cart Input
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/carts.SaveCartInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/carts.Cart'
+      summary: Save or update cart
+      tags:
+      - Cart
+  /carts/product:
+    delete:
+      consumes:
+      - application/json
+      operationId: remove-product-cart
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Remove Product Cart Input
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/carts.RemoveProductInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/carts.Cart'
+      summary: Remove one product from user's cart
+      tags:
+      - Cart
   /categories:
     get:
       operationId: get-all-categories
@@ -227,6 +476,31 @@ paths:
           schema:
             $ref: '#/definitions/users.User'
       summary: Create an account
+      tags:
+      - Account
+  /update-profile:
+    put:
+      operationId: update-user
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Update User input
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/users.UpdateUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+      summary: Updating user data
       tags:
       - Account
 swagger: "2.0"

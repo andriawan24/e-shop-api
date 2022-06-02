@@ -20,5 +20,4 @@ type UpdateUserInput struct {
 	Password    string `json:"password"`
 	PhoneNumber string `json:"phone_number"`
 	Address     string `json:"address"`
-	Error       error
 }

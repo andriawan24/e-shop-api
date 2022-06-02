@@ -18,6 +18,14 @@ func NewCartsHandler(cartsService carts.Service) *cartsHandler {
 	return &cartsHandler{cartsService}
 }
 
+// GetUserCart godoc
+// @Summary Get User Cart
+// @ID get-user-cart
+// @Tags Cart
+// @Produce json
+// @Param Authorization header string true "Access Token"
+// @Success 200 {array} carts.CartFormatter
+// @Router /carts [get]
 func (h *cartsHandler) GetUserCart(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(users.User)
 	userID := currentUser.ID
@@ -48,6 +56,16 @@ func (h *cartsHandler) GetUserCart(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetUserCart godoc
+// @Summary Save or update cart
+// @ID save-or-update-cart
+// @Tags Cart
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token"
+// @Param request_body body carts.SaveCartInput true "Save Cart Input"
+// @Success 200 {object} carts.CartFormatter
+// @Router /carts [post]
 func (h *cartsHandler) SaveOrUpdateCart(c *gin.Context) {
 	var input carts.SaveCartInput
 
@@ -96,6 +114,16 @@ func (h *cartsHandler) SaveOrUpdateCart(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// RemoveProduct godoc
+// @Summary Remove one product from user's cart
+// @ID remove-product-cart
+// @Tags Cart
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token"
+// @Param request_body body carts.RemoveProductInput true "Remove Product Cart Input"
+// @Success 200 {object} bool
+// @Router /carts/product [delete]
 func (h *cartsHandler) RemoveProduct(c *gin.Context) {
 	var input carts.RemoveProductInput
 
@@ -142,6 +170,15 @@ func (h *cartsHandler) RemoveProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// RemoveCart godoc
+// @Summary Remove the whole cart
+// @ID remove-cart
+// @Tags Cart
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token"
+// @Success 200 {object} bool
+// @Router /carts [delete]
 func (h *cartsHandler) RemoveCart(c *gin.Context) {
 
 	currentUser := c.MustGet("currentUser").(users.User)
