@@ -1,6 +1,7 @@
 module e-shop
 
 go 1.17
+// +heroku goVersion go1.17
 
 require (
 	github.com/0xAX/notificator v0.0.0-20220220101646-ee9b8921e557 // indirect
