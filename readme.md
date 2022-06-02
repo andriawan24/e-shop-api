@@ -1,5 +1,5 @@
 # E-Shop
-A brief description of what this project does and who it's for
+API about e-commerce with third party payment integration using midtrans
 
 ## Features
 - Login/register for Customers
@@ -9,8 +9,16 @@ A brief description of what this project does and who it's for
 - Customer can delete product list in shopping cart
 - Customer can checkout and make payment transactions
 
+## Tech Stack
+- Golang
+- Gin Gonic
+- GORM
+- Third Party Payment : Midtrans
+- MariaDB
+- Docker Container
+
 ## API Documentation
-[Documentation](https://linktodocumentation)
+[Documentation](https://e-shop-andriawan24.herokuapp.com/docs/index.html)
 
 ## Feedback
 If you have any feedback, please reach out me at fawaznaufal23@gmail.com
