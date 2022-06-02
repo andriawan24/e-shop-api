@@ -9,6 +9,7 @@ import (
 	"e-shop/src/transactions"
 	"e-shop/src/users"
 	"e-shop/src/utils"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -48,8 +49,13 @@ func main() {
 		log.Fatal("Error while loading .env file")
 	}
 
-	dbURL := os.Getenv("DATABASE_URL")
-	db, err := gorm.Open(mysql.Open(dbURL), &gorm.Config{})
+	USER := os.Getenv("DB_USER")
+	PASS := os.Getenv("DB_PASSWORD")
+	HOST := os.Getenv("DB_HOST")
+	DBNAME := os.Getenv("DB_NAME")
+	URL := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local", USER, PASS,
+		HOST, DBNAME)
+	db, err := gorm.Open(mysql.Open(URL), &gorm.Config{})
 
 	userRepository := users.NewRepository(db)
 	userService := users.NewService(userRepository)

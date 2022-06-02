@@ -1,31 +1,5 @@
 basePath: /api/v1
 definitions:
-  carts.Cart:
-    properties:
-      cartDetail:
-        items:
-          $ref: '#/definitions/carts.CartDetail'
-        type: array
-      id:
-        type: integer
-      user:
-        $ref: '#/definitions/users.User'
-      userID:
-        type: integer
-    type: object
-  carts.CartDetail:
-    properties:
-      cartID:
-        type: integer
-      id:
-        type: integer
-      product:
-        $ref: '#/definitions/products.Product'
-      productID:
-        type: integer
-      quantity:
-        type: integer
-    type: object
   carts.CartDetailFormatter:
     properties:
       cart_id:
@@ -321,7 +295,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carts.CartFormatter'
+            items:
+              $ref: '#/definitions/carts.CartFormatter'
+            type: array
       summary: Get User Cart
       tags:
       - Cart
@@ -347,7 +323,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carts.Cart'
+            $ref: '#/definitions/carts.CartFormatter'
       summary: Save or update cart
       tags:
       - Cart
@@ -374,7 +350,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carts.Cart'
+            type: boolean
       summary: Remove one product from user's cart
       tags:
       - Cart

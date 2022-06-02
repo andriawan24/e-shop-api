@@ -46,7 +46,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carts.CartFormatter"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/carts.CartFormatter"
+                            }
                         }
                     }
                 }
@@ -85,7 +88,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carts.Cart"
+                            "$ref": "#/definitions/carts.CartFormatter"
                         }
                     }
                 }
@@ -156,7 +159,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carts.Cart"
+                            "type": "boolean"
                         }
                     }
                 }
@@ -356,46 +359,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "carts.Cart": {
-            "type": "object",
-            "properties": {
-                "cartDetail": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/carts.CartDetail"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "user": {
-                    "$ref": "#/definitions/users.User"
-                },
-                "userID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "carts.CartDetail": {
-            "type": "object",
-            "properties": {
-                "cartID": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "product": {
-                    "$ref": "#/definitions/products.Product"
-                },
-                "productID": {
-                    "type": "integer"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
         "carts.CartDetailFormatter": {
             "type": "object",
             "properties": {
