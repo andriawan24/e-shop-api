@@ -5,6 +5,7 @@ import (
 	"e-shop/src/utils"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +26,9 @@ func NewProductHandler(productService products.Service) *productHandler {
 // @Success 200 {object} products.Product
 // @Router /products [get]
 func (h *productHandler) GetProducts(c *gin.Context) {
-	productList, err := h.productService.GetAllProducts()
+	categoryId, _ := strconv.Atoi(c.Query("category_id"))
+
+	productList, err := h.productService.GetAllProducts(categoryId)
 	if err != nil {
 		fmt.Println(err.Error())
 		errors := utils.FormatValidationErrors(err)

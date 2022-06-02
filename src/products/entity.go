@@ -6,18 +6,19 @@ import (
 )
 
 type Product struct {
-	ID                int
-	MerchantsID       int
-	Name              string
-	Price             int
-	DiscountedPrice   int
-	Description       string
-	Stocks            int
-	Merchants         merchants.Merchant
-	ProductImages     []ProductImage
-	ProductCategories []ProductCategory
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
+	ID              int
+	MerchantsID     int
+	CategoryID      int
+	Name            string
+	Price           int
+	DiscountedPrice int
+	Description     string
+	Stocks          int
+	Merchants       merchants.Merchant
+	ProductImages   []ProductImage
+	Category        Category
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type ProductImage struct {
@@ -25,14 +26,6 @@ type ProductImage struct {
 	ImageURL  string
 	ProductID int
 }
-
-type ProductCategory struct {
-	ID         int
-	ProductID  int
-	CategoryID int
-	Category   Category
-}
-
 type Category struct {
 	ID          int
 	Name        string

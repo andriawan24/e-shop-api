@@ -11,7 +11,7 @@ type ProductFormatter struct {
 	Stocks          int                         `json:"stocks"`
 	Merchant        merchants.MerchantFormatter `json:"merchant"`
 	ProductImages   []ProductImageFormatter     `json:"images"`
-	ProductCategory []CategoryFormatter         `json:"categories"`
+	ProductCategory CategoryFormatter           `json:"category"`
 }
 
 // Format Image Products
@@ -51,6 +51,15 @@ type CategoryFormatter struct {
 	Description string `json:"description"`
 }
 
+func FormatCategory(category Category) CategoryFormatter {
+	formatter := CategoryFormatter{}
+	formatter.ID = category.ID
+	formatter.Name = category.Name
+	formatter.Description = category.Description
+
+	return formatter
+}
+
 func FormatCategories(categories []Category) []CategoryFormatter {
 	var formatter []CategoryFormatter
 	for _, category := range categories {
@@ -58,20 +67,6 @@ func FormatCategories(categories []Category) []CategoryFormatter {
 		format.ID = category.ID
 		format.Name = category.Name
 		format.Description = category.Description
-		formatter = append(formatter, format)
-	}
-
-	return formatter
-}
-
-func FormatProductCategories(productCategories []ProductCategory) []CategoryFormatter {
-	var formatter []CategoryFormatter
-
-	for _, category := range productCategories {
-		format := CategoryFormatter{}
-		format.ID = category.ID
-		format.Name = category.Category.Name
-		format.Description = category.Category.Description
 		formatter = append(formatter, format)
 	}
 
@@ -88,7 +83,7 @@ func FormatProduct(product Product) ProductFormatter {
 	formatter.Stocks = product.Stocks
 	formatter.Merchant = merchants.FormatMerchant(product.Merchants)
 	formatter.ProductImages = FormatProductImages(product.ProductImages)
-	formatter.ProductCategory = FormatProductCategories(product.ProductCategories)
+	formatter.ProductCategory = FormatCategory(product.Category)
 
 	return formatter
 }

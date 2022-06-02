@@ -8,7 +8,7 @@ import (
 )
 
 type Repository interface {
-	GetProducts() ([]Product, error)
+	GetProducts(categoryId int) ([]Product, error)
 	GetCategories() ([]Category, error)
 }
 
@@ -20,10 +20,16 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) GetProducts() ([]Product, error) {
+func (r *repository) GetProducts(categoryId int) ([]Product, error) {
 	var products []Product
 
-	err := r.db.Preload("ProductCategories.Category").Preload(clause.Associations).Find(&products).Error
+	db := r.db.Preload("Category")
+
+	if categoryId > 0 {
+		db = db.Where("category_id = ?", categoryId)
+	}
+
+	err := db.Preload(clause.Associations).Find(&products).Error
 	if err != nil {
 		log.Fatal(err)
 		return products, err

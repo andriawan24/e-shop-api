@@ -1,7 +1,7 @@
 package products
 
 type Service interface {
-	GetAllProducts() ([]Product, error)
+	GetAllProducts(categoryId int) ([]Product, error)
 	GetCategories() ([]Category, error)
 }
 
@@ -13,8 +13,8 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) GetAllProducts() ([]Product, error) {
-	products, err := s.repository.GetProducts()
+func (s *service) GetAllProducts(categoryId int) ([]Product, error) {
+	products, err := s.repository.GetProducts(categoryId)
 	if err != nil {
 		return products, err
 	}
