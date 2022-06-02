@@ -2,6 +2,7 @@ package main
 
 import (
 	"e-shop/src/auth"
+	"e-shop/src/carts"
 	"e-shop/src/handler"
 	"e-shop/src/products"
 	"e-shop/src/users"
@@ -57,6 +58,10 @@ func main() {
 	productService := products.NewService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
+	cartRepository := carts.NewRepository(db)
+	cartService := carts.NewService(cartRepository)
+	cartHandler := handler.NewCartsHandler(cartService)
+
 	if err != nil {
 		log.Fatal("Error while connecting to SQL " + err.Error())
 	}
@@ -77,15 +82,21 @@ func main() {
 	})
 
 	// Auth
-	api.POST("sign-up", userHandler.RegisterUser)
-	api.POST("sign-in", userHandler.Login)
-	api.POST("me", userHandler.FetchUser)
-	api.PUT("update-profile", authMiddleware(authService, userService), userHandler.UpdateUser)
-	api.GET("me", authMiddleware(authService, userService), userHandler.FetchUser)
+	api.POST("/sign-up", userHandler.RegisterUser)
+	api.POST("/sign-in", userHandler.Login)
+	api.POST("/me", userHandler.FetchUser)
+	api.PUT("/update-profile", authMiddleware(authService, userService), userHandler.UpdateUser)
+	api.GET("/me", authMiddleware(authService, userService), userHandler.FetchUser)
 
 	// Products
 	api.GET("/categories", productHandler.GetCategories)
 	api.GET("/products", productHandler.GetProducts)
+
+	// Carts
+	api.GET("/carts", authMiddleware(authService, userService), cartHandler.GetUserCart)
+	api.POST("/carts", authMiddleware(authService, userService), cartHandler.SaveOrUpdateCart)
+	api.DELETE("/carts", authMiddleware(authService, userService), cartHandler.RemoveCart)
+	api.DELETE("/carts/product", authMiddleware(authService, userService), cartHandler.RemoveProduct)
 
 	// Documentation URL
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
