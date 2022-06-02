@@ -19,6 +19,15 @@ func NewUserHandler(userService users.Service, authService auth.Service) *userHa
 	return &userHandler{userService, authService}
 }
 
+// Register godoc
+// @Summary Create an account
+// @ID register-user
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param request_body body users.RegisterInput true "Register user input"
+// @Success 200 {object} users.User
+// @Router /sign-up [post]
 func (h *userHandler) RegisterUser(c *gin.Context) {
 
 	// Grab user input to struct
@@ -80,6 +89,15 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Login godoc
+// @Summary Sign in to an account
+// @ID login-user
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param request_body body users.LoginInput true "Login input"
+// @Success 200 {object} users.User
+// @Router /sign-in [post]
 func (h *userHandler) Login(c *gin.Context) {
 	// User input (email and password)
 	var input users.LoginInput
@@ -138,6 +156,15 @@ func (h *userHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Fetch godoc
+// @Summary Get detail of an account
+// @ID fetch-user
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token"
+// @Success 200 {object} users.User
+// @Router /me [get]
 func (h *userHandler) FetchUser(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(users.User)
 	formatter := users.FormatUser(currentUser, "")

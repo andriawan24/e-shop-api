@@ -28,11 +28,10 @@ import (
 
 // @title E-Shop API
 // @version 1.0
-// @description This is a sample server todo server. You can visit the GitHub repository at https://github.com/LordGhostX/swag-gin-demo
+// @description API ini dibuat untuk memenuhi salah satu syarat dalam proses perekrutan internship di synapsis.id
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @contact.name Naufal Fawwaz Andriawan
+// @contact.email fawaznaufal23@gmail.com
 
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
@@ -40,7 +39,6 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 // @query.collection.format multi
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -56,8 +54,8 @@ func main() {
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	productRepository := products.NewRepository(db)
-	prductService := products.NewService(productRepository)
-	productHandler := handler.NewProductHandler(prductService)
+	productService := products.NewService(productRepository)
+	productHandler := handler.NewProductHandler(productService)
 
 	if err != nil {
 		log.Fatal("Error while connecting to SQL " + err.Error())
@@ -86,6 +84,7 @@ func main() {
 	api.GET("me", authMiddleware(authService, userService), userHandler.FetchUser)
 
 	// Products
+	api.GET("/categories", productHandler.GetCategories)
 	api.GET("/products", productHandler.GetProducts)
 
 	// Documentation URL

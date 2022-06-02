@@ -79,20 +79,88 @@ definitions:
       productID:
         type: integer
     type: object
+  users.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  users.RegisterInput:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - address
+    - email
+    - name
+    - password
+    - phone_number
+    type: object
+  users.User:
+    properties:
+      address:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+      updatedAt:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server todo server. You can visit the GitHub repository
-    at https://github.com/LordGhostX/swag-gin-demo
+    email: fawaznaufal23@gmail.com
+    name: Naufal Fawwaz Andriawan
+  description: API ini dibuat untuk memenuhi salah satu syarat dalam proses perekrutan
+    internship di synapsis.id
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
   title: E-Shop API
   version: "1.0"
 paths:
+  /me:
+    get:
+      consumes:
+      - application/json
+      operationId: fetch-user
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+      summary: Get detail of an account
+      tags:
+      - Account
   /products:
     get:
       operationId: get-all-products
@@ -106,4 +174,48 @@ paths:
       summary: get all products
       tags:
       - Products
+  /sign-in:
+    post:
+      consumes:
+      - application/json
+      operationId: login-user
+      parameters:
+      - description: Login input
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/users.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+      summary: Sign in to an account
+      tags:
+      - Account
+  /sign-up:
+    post:
+      consumes:
+      - application/json
+      operationId: register-user
+      parameters:
+      - description: Register user input
+        in: body
+        name: request_body
+        required: true
+        schema:
+          $ref: '#/definitions/users.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+      summary: Create an account
+      tags:
+      - Account
 swagger: "2.0"

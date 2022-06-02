@@ -51,8 +51,22 @@ type CategoryFormatter struct {
 	Description string `json:"description"`
 }
 
+func FormatCategories(categories []Category) []CategoryFormatter {
+	var formatter []CategoryFormatter
+	for _, category := range categories {
+		format := CategoryFormatter{}
+		format.ID = category.ID
+		format.Name = category.Name
+		format.Description = category.Description
+		formatter = append(formatter, format)
+	}
+
+	return formatter
+}
+
 func FormatProductCategories(productCategories []ProductCategory) []CategoryFormatter {
 	var formatter []CategoryFormatter
+
 	for _, category := range productCategories {
 		format := CategoryFormatter{}
 		format.ID = category.ID

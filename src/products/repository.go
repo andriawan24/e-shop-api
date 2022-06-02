@@ -9,6 +9,7 @@ import (
 
 type Repository interface {
 	GetProducts() ([]Product, error)
+	GetCategories() ([]Category, error)
 }
 
 type repository struct {
@@ -28,6 +29,17 @@ func (r *repository) GetProducts() ([]Product, error) {
 		return products, err
 	}
 
-	log.Println(products)
 	return products, nil
+}
+
+func (r *repository) GetCategories() ([]Category, error) {
+	var categories []Category
+
+	err := r.db.Find(&categories).Error
+	if err != nil {
+		log.Fatal(err)
+		return categories, err
+	}
+
+	return categories, nil
 }

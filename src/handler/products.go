@@ -32,7 +32,7 @@ func (h *productHandler) GetProducts(c *gin.Context) {
 		errMsg := gin.H{"errors": errors}
 
 		response := utils.APIResponse(
-			"Failed to register",
+			"Failed to get products",
 			http.StatusBadRequest,
 			"error",
 			errMsg,
@@ -46,6 +46,36 @@ func (h *productHandler) GetProducts(c *gin.Context) {
 
 	response := utils.APIResponse(
 		"Success get products",
+		http.StatusOK,
+		"success",
+		formatter,
+	)
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *productHandler) GetCategories(c *gin.Context) {
+	categoryList, err := h.productService.GetCategories()
+	if err != nil {
+		fmt.Println(err.Error())
+		errors := utils.FormatValidationErrors(err)
+		errMsg := gin.H{"errors": errors}
+
+		response := utils.APIResponse(
+			"Failed to get categories",
+			http.StatusBadRequest,
+			"error",
+			errMsg,
+		)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := products.FormatCategories(categoryList)
+
+	response := utils.APIResponse(
+		"Success get categories",
 		http.StatusOK,
 		"success",
 		formatter,
